@@ -1,4 +1,5 @@
-const Pagination = ({ items, pageSize, onPageChange }) => {
+
+  const Pagination = ({ items, pageSize, onPageChange }) => {
     const { Button } = ReactBootstrap;
     if (items.length <= 1) return null;
   
@@ -92,20 +93,23 @@ const Pagination = ({ items, pageSize, onPageChange }) => {
   // App that gets data from Hacker News url
   function App() {
     const { Fragment, useState, useEffect, useReducer } = React;
-    const [query, setQuery] = useState('MIT');
+    const [query, setQuery] = useState('litrpg');
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10;
     const [{ data, isLoading, isError }, doFetch] = useDataApi(
-      'https://hn.algolia.com/api/v1/search?query=MIT',
+      'https://openlibrary.org/search.json?q=litrpg',
       {
-        hits: [],
+        docs: [],
       }
     );
     const handlePageChange = (e) => {
       setCurrentPage(Number(e.target.textContent));
     };
-    let page = data.hits;
-    if (page.length >= 1) {
+    let page = null;
+    if (data) {
+      page = data.docs;
+    }
+    if (page && page.length >= 1) {
       page = paginate(page, currentPage, pageSize);
       console.log(`currentPage: ${currentPage}`);
     }
@@ -115,16 +119,16 @@ const Pagination = ({ items, pageSize, onPageChange }) => {
           <div>Loading ...</div>
         ) : (
           // Part 1, step 2 code goes here
-          <ul class='list-group'>
+          <ul className='list-group'>
             {page.map((item) => (
-              <li key={item.objectID} class='list-group-item'>
-                <a href={item.url}>{item.title}</a>
+              <li key={item.key} className='list-group-item'>
+                {item.title}
               </li>
             ))}
           </ul>
         )}
         <Pagination
-          items={data.hits}
+          items={data.docs}
           pageSize={pageSize}
           onPageChange={handlePageChange}
         ></Pagination>
